@@ -46,22 +46,27 @@ func main() {
 				}
 				got += (line + "\n")
 			case "WANT":
-				if line == "FAIL" {
-					state = "END"
+				if strings.HasPrefix(line, "--- FAIL:") || line == "FAIL" {
+					// print diff
+					b, err := diff("example-diff", []byte(got), []byte(want))
+					if err != nil {
+						log.Fatal(err)
+					}
+					fmt.Println("diff:")
+					fmt.Println(formatDiff(string(b)))
+
+					// reset
+					got = ""
+					want = ""
+					if strings.HasPrefix(line, "--- FAIL: Example") {
+						// skip to the IN_EXAMPLE state if we detect the start of another failing test
+						state = "IN_EXAMPLE"
+					} else {
+						state = ""
+					}
 					return
 				}
 				want += (line + "\n")
-			case "END":
-				// print diff
-				b, err := diff("example-diff", []byte(got), []byte(want))
-				if err != nil {
-					log.Fatal(err)
-				}
-				fmt.Println("diff:")
-				fmt.Println(formatDiff(string(b)))
-
-				state = ""
-				return
 			}
 		}()
 	}
