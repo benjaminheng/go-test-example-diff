@@ -21,48 +21,47 @@ func main() {
 	//	<want>
 	//	FAIL
 
-	var inFailingExample, inGot, inWant bool
 	var got, want string
+	var state string
 	for scanner.Scan() {
 		func() {
 			line := scanner.Text()
 			defer fmt.Println(line)
 
-			if strings.HasPrefix(line, "--- FAIL: Example") {
-				inFailingExample = true
-				return
-			}
-			if inFailingExample && line == "got:" {
-				inGot = true
-				return
-			}
-			if inGot {
+			switch state {
+			case "":
+				if strings.HasPrefix(line, "--- FAIL: Example") {
+					state = "IN_EXAMPLE"
+					return
+				}
+			case "IN_EXAMPLE":
+				if line == "got:" {
+					state = "GOT"
+					return
+				}
+			case "GOT":
 				if line == "want:" {
-					inGot = false
-					inWant = true
+					state = "WANT"
 					return
 				}
 				got += (line + "\n")
-			}
-			if inWant {
+			case "WANT":
 				if line == "FAIL" {
-					inWant = false
-					inFailingExample = false
-
-					// print diff
-					b, err := diff("example-diff", []byte(got), []byte(want))
-					if err != nil {
-						log.Fatal(err)
-					}
-					fmt.Println("diff:")
-					fmt.Println(formatDiff(string(b)))
-
-					// reset everything
-					got = ""
-					want = ""
+					state = "END"
 					return
 				}
 				want += (line + "\n")
+			case "END":
+				// print diff
+				b, err := diff("example-diff", []byte(got), []byte(want))
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Println("diff:")
+				fmt.Println(formatDiff(string(b)))
+
+				state = ""
+				return
 			}
 		}()
 	}
