@@ -3,6 +3,10 @@
 Reads `go test` output, looks for failed examples, and prints a diff for each
 one.
 
+```
+go install github.com/benjaminheng/go-test-example-diff
+```
+
 ## Usage
 
 Pipe `go test` output to the program.
