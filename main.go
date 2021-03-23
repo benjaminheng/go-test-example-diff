@@ -28,7 +28,7 @@ func main() {
 			line := scanner.Text()
 			defer fmt.Println(line)
 
-			if strings.HasPrefix(line, "--- FAIL:") {
+			if strings.HasPrefix(line, "--- FAIL: Example") {
 				inFailingExample = true
 				return
 			}
