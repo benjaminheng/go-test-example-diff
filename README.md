@@ -5,6 +5,14 @@ one.
 
 ## Usage
 
+Pipe `go test` output to the program.
+
+```
+$ go test ./... | go-test-example-diff
+```
+
+## Demo
+
 Given an failing example:
 
 ```go
@@ -22,11 +30,8 @@ func ExampleMain() {
 
 When we execute the tests, it fails with the following output:
 
-```
-$ go test ./...
-```
-
 ```diff
+$ go test ./...
 --- FAIL: ExampleMain (0.00s)
 got:
 {
@@ -43,13 +48,10 @@ FAIL    github.com/benjaminheng/go-test-example-diff    0.005s
 FAIL
 ```
 
-Pipe the test output to the program and a diff is added to the output:
-
-```
-$ go test ./... | go-test-example-diff
-```
+If we pipe the test output to the program, a diff is added for each failing example:
 
 ```diff
+$ go test ./... | go-test-example-diff
 --- FAIL: ExampleMain (0.00s)
 got:
 {
